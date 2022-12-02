@@ -3069,6 +3069,26 @@ class TFATwinPlus303049Packet(Packet):
         pkt['battery'] = 0 if obj.get('battery') == 'OK' else 1
         return Hideki.insert_ids(pkt, TFATwinPlus303049Packet.__name__)
 
+class TFATwinPlusPacket(Packet):
+    # A different non-versioned and simplified TFA TwinPlus Packet
+
+    # '{"time" : "2022-12-02 08:06:58", "model" : "TFA-TwinPlus", "id" : 4, "channel" : 0, "battery_ok" : 1, "temperature_C" : 13.900, "humidity" : 75, "mic" : "CHECKSUM"}
+
+    IDENTIFIER = "TFA-TwinPlus"
+
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRIC
+        pkt['station_id'] = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        pkt['battery'] = 0 if Packet.get_float(obj, 'battery_ok') == 1 else 1
+        return TFATwinPlusPacket.insert_ids(pkt)
+
+    def insert_ids(pkt):
+        station_id = pkt.pop('station_id', '0000')
+        return Packet.add_identifiers(pkt, station_id, TFATwinPlusPacket.__name__)
 
 class TSFT002Packet(Packet):
     # time : 2019-12-22 16:57:58
