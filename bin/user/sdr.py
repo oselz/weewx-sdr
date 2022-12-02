@@ -2053,7 +2053,7 @@ class InkbirdITH20R(Packet):
 
     # {"time" : "2022-12-02 08:23:48", "model" : "Inkbird ITH-20R", "id" : 38689, "battery" : 89, "sensor_num" : 1, "mic" : "CRC", "temperature_C" : 21.400, "temperature2_C" : 130.000, "humidity" : 52.000}
 
-    IDENTIFER = "Inkbird ITH-20R"
+    IDENTIFIER = "Inkbird ITH-20R"
 
     @staticmethod
     def parse_json(obj):
