@@ -1568,6 +1568,27 @@ class FOWH2Packet(Packet):
         station_id = pkt.pop('station_id', '0000')
         return Packet.add_identifiers(pkt, station_id, FOWH2Packet.__name__)
 
+class FOWH2AltPacket(Packet):
+    # Variation of the Fine Offset WH2 with different IDENTIFIER and including humidity data.
+
+    # '{"time" : "2022-12-02 07:50:09", "model" : "Fineoffset-WH2", "id" : 15, "temperature_C" : 14.400, "humidity" : 45, "mic" : "CRC"}
+
+    IDENTIFIER = "Fineoffset-WH2"
+
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRIC
+        pkt['station_id'] = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        return FOWH2AltPacket.insert_ids(pkt)
+
+    @staticmethod
+    def insert_ids(pkt):
+        station_id = pkt.pop('station_id', '0000')
+        return Packet.add_identifiers(pkt, station_id, FOWH2AltPacket.__name__)
+
 
 class FOWH32BPacket(Packet):
     # This is for a WH32B which is the indoors sensor array for an Ambient
