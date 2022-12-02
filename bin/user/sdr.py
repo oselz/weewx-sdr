@@ -2047,6 +2047,32 @@ class InFactoryTHPacket(Packet):
         pkt = Packet.add_identifiers(pkt, sensor_id, InFactoryTHPacket.__name__)
         return pkt
 
+class InkbirdITH20R(Packet):
+    # Inkbird ITH-20R is a digital hygrometer/thermometer supporting remote
+    # readings from up to three devices, each with an optional remote temperature probe.
+
+    # {"time" : "2022-12-02 08:23:48", "model" : "Inkbird ITH-20R", "id" : 38689, "battery" : 89, "sensor_num" : 1, "mic" : "CRC", "temperature_C" : 21.400, "temperature2_C" : 130.000, "humidity" : 52.000}
+
+    IDENTIFER = "Inkbird ITH-20R"
+
+    @staticmethod
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRIC
+        pkt['station_id'] = obj.get('id')
+        # sensor number when synced to a display reading multiple sensors,
+        # could potentially be appended to station_id however it is not
+        # stable and can change re-sync (eg, change of batteries)
+        pkt['sensor_num'] = obj.get('sensor_num')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        # reading from external temperature probe, 130.000 indicates no sensor present
+        pkt['temperature2'] = Packet.get_float(obj, 'temperature2_C')
+        pkt['humidity'] = Packet.get_float(obj, 'humidity')
+        # battery is percentage, assume < 10% is low battery
+        pkt['battery'] = 1 if obj.get('battery') < 10  else 0
+        return Packet.add_identifiers(pkt, pkt['station_id'], InkbirdITH20R.__name__)
+
 
 class LaCrosseBreezeProPacket(Packet):
     # sample json output from rtl_433
