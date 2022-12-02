@@ -2084,7 +2084,7 @@ class InkbirdITH20R(Packet):
         pkt['station_id'] = obj.get('id')
         # sensor number when synced to a display reading multiple sensors,
         # could potentially be appended to station_id however it is not
-        # stable and can change re-sync (eg, change of batteries)
+        # stable and can change on re-sync (eg, new batteries)
         pkt['sensor_num'] = obj.get('sensor_num')
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         # reading from external temperature probe, 130.000 indicates no sensor present
@@ -2092,7 +2092,8 @@ class InkbirdITH20R(Packet):
         pkt['humidity'] = Packet.get_float(obj, 'humidity')
         # battery is percentage, assume < 10% is low battery
         pkt['battery'] = 1 if obj.get('battery') < 10  else 0
-        return Packet.add_identifiers(pkt, pkt['station_id'], InkbirdITH20R.__name__)
+        station_id = str(pkt.pop('station_id', '0000'))
+        return Packet.add_identifiers(pkt, station_id, InkbirdITH20R.__name__)
 
 
 class LaCrosseBreezeProPacket(Packet):
