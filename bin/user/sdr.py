@@ -2095,6 +2095,24 @@ class InkbirdITH20R(Packet):
         station_id = str(pkt.pop('station_id', '0000'))
         return Packet.add_identifiers(pkt, station_id, InkbirdITH20R.__name__)
 
+class InovalleyKW9015B(Packet):
+    # Inovalley kw9015b / TFA 30.3161 / Aercus KW9015
+    #   Rain and Temperature Weather Station
+
+    # {"time" : "2023-02-25 22:27:27", "model" : "Inovalley-kw9015b", "id" : 4, "battery_ok" : 1, "temperature_C" : 22.400, "rain" : 579, "rain_mm" : 260.550}
+
+    IDENTIFIER = "Inovalley-kw9015b"
+
+    def parse_json(obj):
+        pkt = dict()
+        pkt['dateTime'] = Packet.parse_time(obj.get('time'))
+        pkt['usUnits'] = weewx.METRIC
+        sensor_id = obj.get('id')
+        pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
+        pkt['battery'] = 0 if obj.get('battery_ok') == 1 else 1
+        pkt['rain_total'] = Packet.get_float(obj, 'rain_mm')
+        return Packet.add_identifiers(pkt, sensor_id, InovalleyKW9015B.__name__)
+
 
 class LaCrosseBreezeProPacket(Packet):
     # sample json output from rtl_433
