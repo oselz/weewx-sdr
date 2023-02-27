@@ -2106,7 +2106,7 @@ class InovalleyKW9015B(Packet):
     def parse_json(obj):
         pkt = dict()
         pkt['dateTime'] = Packet.parse_time(obj.get('time'))
-        pkt['usUnits'] = weewx.METRIC
+        pkt['usUnits'] = weewx.METRICWX
         sensor_id = obj.get('id')
         pkt['temperature'] = Packet.get_float(obj, 'temperature_C')
         pkt['battery'] = 0 if obj.get('battery_ok') == 1 else 1
